@@ -13,14 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.xwalk.core.JavascriptInterface;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
 
 import java.util.List;
 
-import tech.wcdi.spajam.myapplication.Graphics.OGLSurfaceView;
-
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements SensorEventListener {
     private static final int MATRIX_SIZE = 16;
     SensorManager mSensorManager;
     boolean mIsMagSensor = false, mIsAccSensor = false;
@@ -30,9 +29,8 @@ public class MainFragment extends Fragment {
     /* センサーの値 */ float[] orientationValues = new float[3];
     float[] magneticValues = new float[3];
     float[] accelerometerValues = new float[3];
-    private GLSurfaceView mGLView;
-
     XWalkView xWalkView;
+    private GLSurfaceView mGLView;
 
     public MainFragment() {
         super();
@@ -73,6 +71,7 @@ public class MainFragment extends Fragment {
                 return false;
             }
         });
+        xWalkView.addJavascriptInterface(new DataTransfer(), "dataTransfer");
         xWalkView.loadUrl("file:///android_asset/index.html");
     }
 
@@ -84,6 +83,14 @@ public class MainFragment extends Fragment {
             xWalkView.pauseTimers();
             xWalkView.onHide();
         }
+
+        //センサーマネージャのリスナ登録破棄
+        if (mIsMagSensor || mIsAccSensor) {
+            mSensorManager.unregisterListener(this);
+            mIsMagSensor = false;
+            mIsAccSensor = false;
+        }
+
     }
 
     @Override
@@ -94,6 +101,27 @@ public class MainFragment extends Fragment {
             xWalkView.resumeTimers();
             xWalkView.onShow();
         }
+
+        // センサの取得
+        List<Sensor> sensors = mSensorManager.getSensorList(Sensor.TYPE_ALL);
+
+        // センサマネージャへリスナーを登録(implements SensorEventListenerにより、thisで登録する)
+        for (Sensor sensor : sensors) {
+
+            if (sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
+                mSensorManager.registerListener((SensorEventListener) this,
+                        sensor,
+                        SensorManager.SENSOR_DELAY_GAME);
+                mIsMagSensor = true;
+            }
+
+            if (sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                mSensorManager.registerListener((SensorEventListener) this,
+                        sensor,
+                        SensorManager.SENSOR_DELAY_GAME);
+                mIsAccSensor = false;
+            }
+        }
     }
 
     @Override
@@ -103,6 +131,68 @@ public class MainFragment extends Fragment {
         if (xWalkView != null)
             xWalkView.onDestroy();
     }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        if (event.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE) {
+            return;
+        }
+
+        switch (event.sensor.getType()) {
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                magneticValues = event.values.clone();
+                break;
+            case Sensor.TYPE_ACCELEROMETER:
+                accelerometerValues = event.values.clone();
+                break;
+        }
+
+        if (magneticValues != null && accelerometerValues != null) {
+
+            SensorManager.getRotationMatrix(inR, I, accelerometerValues, magneticValues);
+
+            //Activityの表示が縦固定の場合。横向きになる場合、修正が必要です
+            SensorManager.remapCoordinateSystem(inR,
+                    SensorManager.AXIS_X,
+                    SensorManager.AXIS_Z,
+                    outR);
+            SensorManager.getOrientation(outR, orientationValues);
+
+            Log.v("Orientation", String.valueOf(radianToDegree(orientationValues[0])) + ", " +
+                    //Z軸方向,azimuth
+                    String.valueOf(radianToDegree(orientationValues[1])) + ", " +
+                    //X軸方向,pitch
+                    String.valueOf(radianToDegree(orientationValues[2])));       //Y軸方向,roll
+        }
+    }
+
+    int radianToDegree(float rad) {
+        return (int) Math.floor(Math.toDegrees(rad));
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    public class DataTransfer {
+
+        @JavascriptInterface
+        public float[] getAccSensorData() {
+            return accelerometerValues;
+        }
+
+
+        @JavascriptInterface
+        public float[] getMagSensorData() {
+            return magneticValues;
+        }
+    }
+
+
+
+
+
 
     /*
 
