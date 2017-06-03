@@ -7,16 +7,20 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.xwalk.core.XWalkResourceClient;
+import org.xwalk.core.XWalkView;
+
 import java.util.List;
 
 import tech.wcdi.spajam.myapplication.Graphics.OGLSurfaceView;
 
-public class MainFragment extends Fragment implements SensorEventListener {
+public class MainFragment extends Fragment {
     private static final int MATRIX_SIZE = 16;
     SensorManager mSensorManager;
     boolean mIsMagSensor = false, mIsAccSensor = false;
@@ -27,6 +31,8 @@ public class MainFragment extends Fragment implements SensorEventListener {
     float[] magneticValues = new float[3];
     float[] accelerometerValues = new float[3];
     private GLSurfaceView mGLView;
+
+    XWalkView xWalkView;
 
     public MainFragment() {
         super();
@@ -44,6 +50,61 @@ public class MainFragment extends Fragment implements SensorEventListener {
 
         return fragment;
     }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_main, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        xWalkView = (XWalkView) view.findViewById(R.id.xWalkView);
+        xWalkView.setResourceClient(new XWalkResourceClient(xWalkView) {
+            @Override
+            public void onLoadFinished(XWalkView view, String url) {
+                super.onLoadFinished(view, url);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(XWalkView view, String url) {
+                return false;
+            }
+        });
+        xWalkView.load("https://google.com", null);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        if (xWalkView != null) {
+            xWalkView.pauseTimers();
+            xWalkView.onHide();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (xWalkView != null) {
+            xWalkView.resumeTimers();
+            xWalkView.onShow();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (xWalkView != null)
+            xWalkView.onDestroy();
+    }
+
+    /*
 
     @Override
     public void onResume() {
@@ -138,4 +199,5 @@ public class MainFragment extends Fragment implements SensorEventListener {
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
     }
+    */
 }
