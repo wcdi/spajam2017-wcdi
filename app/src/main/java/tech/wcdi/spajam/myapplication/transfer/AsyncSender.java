@@ -1,6 +1,5 @@
 package tech.wcdi.spajam.myapplication.transfer;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import net.arnx.jsonic.JSON;
@@ -19,11 +18,7 @@ import okhttp3.Response;
 
 public class AsyncSender {
 
-    private String URL = "http://server.wcdi.tech/";
-
-    public class Sender extends AsyncTask<Data, Data, Data> {
         public final MediaType jsontype = MediaType.parse("application/json; charset=utf-8");
-        private final String urlHosts = URL;
         public String urlPath = "/index.html";
         // 入力データ群
         // 全データ
@@ -32,6 +27,8 @@ public class AsyncSender {
         public String url;
         // 受信したデータ
         Data reply;
+    private String URL = "http://server.wcdi.tech/";
+    private final String urlHosts = URL;
 
         public void setPath(String path) {
             this.url = this.urlHosts + path;
@@ -62,7 +59,6 @@ public class AsyncSender {
             return response.body().string();
         }
 
-        @Override
         protected Data doInBackground(Data... params) {
             try {
                 Log.d("TRANSFER/START", "Download start...");
@@ -78,5 +74,4 @@ public class AsyncSender {
             Log.d("TRANSFER/FINISH", "TRANSFER FINISHED.");
             return null;
         }
-    }
 }
