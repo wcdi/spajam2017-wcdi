@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.firebase.ui.auth.ResultCodes;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -24,9 +25,6 @@ public class SetupFragment extends Fragment {
         void apply();
     }
 
-    public static final String on_setup_key = "on_setup";
-    public static final String on_setup_failed_key = "on_setup_failed";
-
     public OnSetup onSetup;
     public OnSetupFailed onSetupFailed;
 
@@ -39,8 +37,8 @@ public class SetupFragment extends Fragment {
         OnSetupFailed onSetupFailed
     ) {
         Bundle arguments = new Bundle();
-        arguments.putSerializable(on_setup_key, onSetup);
-        arguments.putSerializable(on_setup_failed_key, onSetupFailed);
+        arguments.putSerializable(OnSetup.class.getName(), onSetup);
+        arguments.putSerializable(OnSetupFailed.class.getName(), onSetupFailed);
 
         SetupFragment fragment = new SetupFragment();
         fragment.setArguments(arguments);
@@ -52,8 +50,8 @@ public class SetupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        onSetup = (OnSetup) getArguments().getSerializable(on_setup_key);
-        onSetupFailed = (OnSetupFailed) getArguments().getSerializable(on_setup_failed_key);
+        onSetup = (OnSetup) getArguments().getSerializable(OnSetup.class.getName());
+        onSetupFailed = (OnSetupFailed) getArguments().getSerializable(OnSetupFailed.class.getName());
     }
 
     @Override
@@ -91,7 +89,14 @@ public class SetupFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1000)
-            onSetup.apply(IdpResponse.fromResultIntent(data));
+        if (requestCode == 1000) {
+            if (resultCode == ResultCodes.OK)
+                onSetup.apply(IdpResponse.fromResultIntent(data));
+            else if (resultCode == ResultCodes.CANCELED)
+                onSetupFailed.apply();
+            else
+                onSetupFailed.apply();
+
+        }
     }
 }
