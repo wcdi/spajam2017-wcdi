@@ -81,8 +81,6 @@ public class MainActivity extends AppCompatActivity
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-        ListView drawerList = (ListView) findViewById(R.id.left_drawer);
-
 //        ListView drawerList = (ListView) findViewById(R.id.left_drawer);
 
 //        drawerList.setAdapter(
