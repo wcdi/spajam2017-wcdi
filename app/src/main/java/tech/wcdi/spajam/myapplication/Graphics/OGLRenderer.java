@@ -5,6 +5,9 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -21,7 +24,9 @@ public class OGLRenderer implements GLSurfaceView.Renderer {
     private final float[] mMVPMatrix = new float[16];
     private final float[] mProjectionMatrix = new float[16];
     private final float[] mViewMatrix = new float[16];
-    private final float[] mRotationMatrix = new float[16];
+    List<Square> stars = new ArrayList<>();
+    double alfa = 0.0;
+    double bravo = 0.0;
     private Square mSquare;
     private float mAngle;
 
@@ -73,8 +78,30 @@ public class OGLRenderer implements GLSurfaceView.Renderer {
 
         // Set the background frame color
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        //        for( Model i: models.get()){
+        //
+        //        }
+        for (float i = 0; i < 24; i += 0.1) {
+            for (float j = 0; j < 90; j += 2) {
+                stars.add(new Square(i, j));
+            }
+        }
+    }
 
-        mSquare   = new Square();
+    public double getAlfa() {
+        return alfa;
+    }
+
+    public void setAlfa(double alfa) {
+        this.alfa = alfa;
+    }
+
+    public double getBravo() {
+        return bravo;
+    }
+
+    public void setBravo(double bravo) {
+        this.bravo = bravo;
     }
 
     @Override
@@ -91,7 +118,9 @@ public class OGLRenderer implements GLSurfaceView.Renderer {
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 
         // Draw square
-        mSquare.draw(mMVPMatrix);
+        for (Square sq : stars) {
+            sq.draw(mMVPMatrix);
+        }
 
         // Create a rotation for the triangle
 
@@ -100,12 +129,12 @@ public class OGLRenderer implements GLSurfaceView.Renderer {
         // long time = SystemClock.uptimeMillis() % 4000L;
         // float angle = 0.090f * ((int) time);
 
-        Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, 1.0f);
+        //Matrix.setRotateM(mRotationMatrix, 0, mAngle, 0, 0, 1.0f);
 
         // Combine the rotation matrix with the projection and camera view
         // Note that the mMVPMatrix factor *must be first* in order
         // for the matrix multiplication product to be correct.
-        Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
+        //Matrix.multiplyMM(scratch, 0, mMVPMatrix, 0, mRotationMatrix, 0);
 
         // Draw triangle
         //mTriangle.draw(scratch);
@@ -139,5 +168,4 @@ public class OGLRenderer implements GLSurfaceView.Renderer {
     public void setAngle(float angle) {
         mAngle = angle;
     }
-
 }

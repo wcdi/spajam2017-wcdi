@@ -5,11 +5,13 @@ package tech.wcdi.spajam.myapplication.Graphics.Rect;
  */
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
+import java.util.Date;
 
 import tech.wcdi.spajam.myapplication.Graphics.OGLRenderer;
 
@@ -20,10 +22,10 @@ public class Square {
 
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 3;
-    static float squareCoords[] = {-0.05f, 0.0f, 0.0f,   // top left
-                                   0.0f, -0.05f, 0.0f,   // bottom left
-                                   0.05f, 0.0f, 0.0f,   // bottom right
-                                   0.0f, 0.05f, 0.0f}; // top right
+    static float squareCoords[] = {-0.05f, 0.0f, 1.0f,   // top left
+                                   0.0f, -0.05f, 1.0f,   // bottom left
+                                   0.05f, 0.0f, 1.0f,   // bottom right
+                                   0.0f, 0.05f, 1.0f}; // top right
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate
             // the coordinates of the objects that use this vertex shader
@@ -44,15 +46,19 @@ public class Square {
     private final int mProgram;
     private final short drawOrder[] = {0, 1, 2, 0, 2, 3}; // order to draw vertices
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
-    float color[] = {0.2f, 0.709803922f, 0.898039216f, 1.0f};
+    float[] rotate = new float[16];
+    double degree = 0.0;
+    double higher = 0.0;
+    private float color[] = {0.2f, 0.709803922f, 0.898039216f, 1.0f};
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
 
+
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
      */
-    public Square() {
+    public Square(double a, double h) {
         // initialize vertex byte buffer for shape coordinates
         ByteBuffer bb = ByteBuffer.allocateDirect(
                 // (# of coordinate values * 4 bytes per float)
@@ -75,10 +81,78 @@ public class Square {
         int vertexShader = OGLRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
         int fragmentShader = OGLRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
-        mProgram = GLES20.glCreateProgram();             // create empty OpenGL Program
+        degree = a;
+        higher = h;
+
+        mProgram = GLES20.glCreateProgram();
+        // create empty OpenGL Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
         GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);                  // create OpenGL program executables
+        GLES20.glLinkProgram(mProgram);
+    }
+
+    static double calcMjd(int year, int month, int day) {
+        int y, m;
+        if (month <= 2) {
+            y = year - 1;
+            m = month + 12;
+        } else {
+            y = year;
+            m = month;
+        }
+        return Math.round((Math.floor(365.25 * y) + Math.floor(y / 400) - Math.floor(y / 100)) +
+                Math.floor(30.59 * (m - 2)) +
+                day - 678912);
+    }
+
+    static double[] ec2hc(float latitude, float longitude, int alphadec, int deltadec) {
+
+        Date date = new Date();
+        int year = date.getYear();
+        int month = date.getMonth();
+        int day = date.getDay();
+        int hour = date.getHours();
+        int minute = date.getMinutes();
+        int second = date.getSeconds();
+        double alpha = alphadec / 3600.0;
+        double delta = deltadec / 3600.0;
+        double PI = 3.14159265358979;
+        double RAD = 180 / PI;
+
+        double mjd = calcMjd(year, month, day) + hour / 24 + minute / 1440 + second / 86400 - 0.375;
+        double d = (0.671262 + 1.002737909 * (mjd - 40000) + longitude / 360);
+        double lst = 2 * PI * (d - Math.floor(d));
+
+        double srid = Math.sin(latitude / RAD);
+        double crid = Math.cos(latitude / RAD);
+        double ra = 15 * alpha / RAD;
+        double dc = delta / RAD;
+        double ha = lst - ra;
+        double sdc = Math.sin(dc);
+        double cdc = Math.cos(dc);
+        double sha = Math.sin(ha);
+        double cha = Math.cos(ha);
+        double xs = sdc * srid + cdc * crid * cha;
+        double h = Math.asin(xs);
+        double s = cdc * sha;
+        double c = cdc * srid * cha - sdc * crid;
+        double a;
+        if (c < 0) {
+            a = Math.atan(s / c) + PI;
+        } else if (c > 0 && s <= 0) {
+            a = Math.atan(s / c) + 2 * PI;
+        } else {
+            a = Math.atan(s / c);
+        }
+        if (h == 0) {
+            h = 0.00001;
+        }
+        a = a * RAD;
+        h = h * RAD;
+        double rt = Math.tan((h + 8.6 / (h + 4.4)) / RAD);       // ��C�␳
+        h = h + 0.0167 / rt;
+
+        return new double[]{(a + 180) % 360, h};
     }
 
     /**
@@ -114,7 +188,7 @@ public class Square {
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         OGLRenderer.checkGlError("glGetUniformLocation");
-
+        Matrix.setRotateM(rotate, 0, (float) higher, (float) degree, 0, 1.0f);
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
         OGLRenderer.checkGlError("glUniformMatrix4fv");
