@@ -20,6 +20,7 @@ import org.xwalk.core.XWalkView;
 import java.util.List;
 
 public class MainFragment extends Fragment implements SensorEventListener {
+
     private static final int MATRIX_SIZE = 16;
     SensorManager mSensorManager;
     boolean mIsMagSensor = false, mIsAccSensor = false;
