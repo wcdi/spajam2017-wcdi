@@ -73,7 +73,7 @@ public class MainFragment extends Fragment {
                 return false;
             }
         });
-        xWalkView.load("file:///android_asset/index.html", null);
+        xWalkView.loadUrl("file:///android_asset/index.html");
     }
 
     @Override
