@@ -11,7 +11,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,16 +31,29 @@ public class MainActivity extends AppCompatActivity {
                     new SetupFragment.OnSetup() {
                         @Override
                         public void apply(IdpResponse response) {
-                            Toast
-                                .makeText(
-                                    MainActivity.this,
-                                    response.getEmail(),
-                                    Toast.LENGTH_LONG
-                                )
-                                .show();
-
                             manager.beginTransaction()
-                                .replace(R.id.content_frame, MainFragment.newInstance())
+                                .replace(
+                                    R.id.content_frame,
+                                    ResourceDownloadingFragment.newInstance(
+                                        new ResourceDownloadingFragment.OnSuccess() {
+                                            @Override
+                                            public void apply(File file) {
+                                                manager.beginTransaction()
+                                                    .replace(
+                                                        R.id.content_frame,
+                                                        MainFragment.newInstance()
+                                                    )
+                                                    .commit();
+                                            }
+                                        },
+                                        new ResourceDownloadingFragment.OnFailure() {
+                                            @Override
+                                            public void apply() {
+
+                                            }
+                                        }
+                                    )
+                                )
                                 .commit();
                         }
                     },
