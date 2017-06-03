@@ -97,41 +97,44 @@ public class Square {
         GLES20.glLinkProgram(mProgram);
     }
 
-    static double calcMjd(int year, int month, int day) {
-        int y, m;
+    static double calcMjd(double year, double month, double day) {
+        double y, m;
         if (month <= 2) {
-            y = year - 1;
-            m = month + 12;
+            y = year - 1.0;
+            m = month + 12.0;
         } else {
             y = year;
             m = month;
         }
-        return Math.round((Math.floor(365.25 * y) + Math.floor(y / 400) - Math.floor(y / 100)) +
-                Math.floor(30.59 * (m - 2)) +
-                day - 678912);
+        return Math.round((Math.floor(365.25 * y) + Math.floor(y / 400.0) - Math.floor(y / 100.0)) +
+                Math.floor(30.59 * (m - 2.0)) +
+                day - 678912.0);
     }
 
     static double[] ec2hc(float latitude, float longitude, int alphadec, int deltadec) {
 
         Date date = new Date();
-        int year = date.getYear();
-        int month = date.getMonth();
-        int day = date.getDay();
-        int hour = date.getHours();
-        int minute = date.getMinutes();
-        int second = date.getSeconds();
-        double alpha = alphadec / 3600.0;
-        double delta = deltadec / 3600.0;
+        double year = date.getYear();
+        double month = date.getMonth();
+        double day = date.getDay();
+        double hour = date.getHours();
+        double minute = date.getMinutes();
+        double second = date.getSeconds();
+        double alpha = (double) alphadec / 3600.0;
+        double delta = (double) deltadec / 3600.0;
         double PI = 3.14159265358979;
-        double RAD = 180 / PI;
+        double RAD = 180.0 / PI;
 
-        double mjd = calcMjd(year, month, day) + hour / 24 + minute / 1440 + second / 86400 - 0.375;
-        double d = (0.671262 + 1.002737909 * (mjd - 40000) + longitude / 360);
-        double lst = 2 * PI * (d - Math.floor(d));
+        double
+                mjd =
+                calcMjd(year, month, day) + hour / 24.0 + minute / 1440.0 + second / 86400.0 -
+                        0.375;
+        double d = (0.671262 + 1.002737909 * (mjd - 40000.0) + longitude / 360.0);
+        double lst = 2.0 * PI * (d - Math.floor(d));
 
         double srid = Math.sin(latitude / RAD);
         double crid = Math.cos(latitude / RAD);
-        double ra = 15 * alpha / RAD;
+        double ra = 15.0 * alpha / RAD;
         double dc = delta / RAD;
         double ha = lst - ra;
         double sdc = Math.sin(dc);
@@ -155,10 +158,10 @@ public class Square {
         }
         a = a * RAD;
         h = h * RAD;
-        double rt = Math.tan((h + 8.6 / (h + 4.4)) / RAD);       // ��C�␳
+        double rt = Math.tan((h + 8.6 / (h + 4.4)) / RAD);
         h = h + 0.0167 / rt;
 
-        return new double[]{(a + 180) % 360, h};
+        return new double[]{(a + 180.0) % 360.0, h};
     }
 
     public void draw(float[] mMvpMatrix) {

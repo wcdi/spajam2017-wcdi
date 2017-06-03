@@ -1,9 +1,10 @@
 package tech.wcdi.spajam.myapplication;
 
 import android.app.FragmentManager;
+import android.hardware.SensorManager;
+import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,9 +12,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static SensorManager mSensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final FragmentManager manager = getFragmentManager();
-
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         manager.beginTransaction()
             .add(
                 R.id.content_frame,
