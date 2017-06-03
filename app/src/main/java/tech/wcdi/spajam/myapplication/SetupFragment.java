@@ -96,7 +96,6 @@ public class SetupFragment extends Fragment {
                 onSetupFailed.apply();
             else
                 onSetupFailed.apply();
-
         }
     }
 }
