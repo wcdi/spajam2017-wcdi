@@ -81,8 +81,8 @@ public class OGLRenderer implements GLSurfaceView.Renderer {
         //        for( Model i: models.get()){
         //
         //        }
-        for (float i = 0; i < 24; i += 0.1) {
-            for (float j = 0; j < 90; j += 2) {
+        for (float i = 0; i < 24; i += 3) {
+            for (float j = -90; j < 90; j += 1) {
                 stars.add(new Square(i, j));
             }
         }

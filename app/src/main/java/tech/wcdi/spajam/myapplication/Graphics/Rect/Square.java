@@ -49,11 +49,17 @@ public class Square {
     float[] rotate = new float[16];
     double degree = 0.0;
     double higher = 0.0;
+    /**
+     * Encapsulates the OpenGL ES instructions for drawing this shape.
+     *
+     * @param mvpMatrix - The Model View Project matrix in which to draw
+     * this shape.
+     */
+    float[] mvpMatrix = new float[12];
     private float color[] = {0.2f, 0.709803922f, 0.898039216f, 1.0f};
     private int mPositionHandle;
     private int mColorHandle;
     private int mMVPMatrixHandle;
-
 
     /**
      * Sets up the drawing object data for use in an OpenGL ES context.
@@ -155,13 +161,7 @@ public class Square {
         return new double[]{(a + 180) % 360, h};
     }
 
-    /**
-     * Encapsulates the OpenGL ES instructions for drawing this shape.
-     *
-     * @param mvpMatrix - The Model View Project matrix in which to draw
-     *                  this shape.
-     */
-    public void draw(float[] mvpMatrix) {
+    public void draw(float[] mMvpMatrix) {
         // Add program to OpenGL environment
         GLES20.glUseProgram(mProgram);
 
@@ -191,6 +191,8 @@ public class Square {
         Matrix.setRotateM(rotate, 0, (float) higher, (float) degree, 0, 1.0f);
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mvpMatrix, 0);
+        Matrix.multiplyMM(mvpMatrix, 0, mMvpMatrix, 0, rotate, 0);
+
         OGLRenderer.checkGlError("glUniformMatrix4fv");
 
         // Draw the square
