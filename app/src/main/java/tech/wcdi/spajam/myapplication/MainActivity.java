@@ -8,6 +8,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,14 +24,32 @@ public class MainActivity extends AppCompatActivity {
         final FragmentManager manager = getFragmentManager();
 
         manager.beginTransaction()
-            .add(R.id.content_frame, SetupFragment.newInstance(new SetupFragment.OnSetup() {
-                @Override
-                public void apply() {
-                    manager.beginTransaction()
-                        .replace(R.id.content_frame, MainFragment.newInstance())
-                        .commit();
-                }
-            }))
+            .add(
+                R.id.content_frame,
+                SetupFragment.newInstance(
+                    new SetupFragment.OnSetup() {
+                        @Override
+                        public void apply(IdpResponse response) {
+                            Toast
+                                .makeText(
+                                    MainActivity.this,
+                                    response.getEmail(),
+                                    Toast.LENGTH_LONG
+                                )
+                                .show();
+
+                            manager.beginTransaction()
+                                .replace(R.id.content_frame, MainFragment.newInstance())
+                                .commit();
+                        }
+                    },
+                    new SetupFragment.OnSetupFailed() {
+                        @Override
+                        public void apply() {
+                            MainActivity.this.finish();
+                        }
+                    }
+                ))
             .commit();
 
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
