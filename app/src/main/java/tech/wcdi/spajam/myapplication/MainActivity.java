@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.firebase.ui.auth.IdpResponse;
 
@@ -51,12 +50,12 @@ public class MainActivity extends AppCompatActivity
                                         new ResourceDownloadingFragment.OnSuccess() {
                                             @Override
                                             public void apply(File file) {
-                                                /*manager.beginTransaction()
+                                                manager.beginTransaction()
                                                     .replace(
                                                         R.id.content_frame,
                                                         MainFragment.newInstance()
                                                     )
-                                                    .commit();*/
+                                                    .commit();
                                             }
                                         },
                                         new ResourceDownloadingFragment.OnFailure() {
