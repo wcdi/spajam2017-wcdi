@@ -41,12 +41,12 @@ public class MainActivity extends AppCompatActivity {
                                         new ResourceDownloadingFragment.OnSuccess() {
                                             @Override
                                             public void apply(File file) {
-                                                manager.beginTransaction()
+                                                /*manager.beginTransaction()
                                                     .replace(
                                                         R.id.content_frame,
                                                         MainFragment.newInstance()
                                                     )
-                                                    .commit();
+                                                    .commit();*/
                                             }
                                         },
                                         new ResourceDownloadingFragment.OnFailure() {
