@@ -5,12 +5,12 @@ package tech.wcdi.spajam.myapplication.models;
  */
 
 public class Star {
-    int id;
-    String constellation;
-    String name;
-    int ra;
-    int dec;
-    int light_class;
+    private int id;
+    private String constellation;
+    private String name;
+    private int ra;
+    private int dec;
+    private int light_class;
 
     public int getId() {
         return id;
