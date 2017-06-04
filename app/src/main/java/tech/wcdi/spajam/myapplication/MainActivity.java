@@ -29,8 +29,8 @@ public class MainActivity extends AppCompatActivity {
         manager.beginTransaction()
             .add(
                 R.id.content_frame,
-                SetupFragment.newInstance(
-                    new SetupFragment.OnSetup() {
+                SignInFragment.newInstance(
+                    new SignInFragment.OnSignIn() {
                         @Override
                         public void apply(IdpResponse response) {
                             manager.beginTransaction()
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                                 .commit();
                         }
                     },
-                    new SetupFragment.OnSetupFailed() {
+                    new SignInFragment.OnSignInFailed() {
                         @Override
                         public void apply() {
                             MainActivity.this.finish();
