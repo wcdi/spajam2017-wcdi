@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>introduction</title>
+    <meta charset="utf-8">
+
+    <script src="js/three.min.js"></script>
+    <script>
+  var width, height;
+  var renderer;
+  function initThree() {
+    width = document.getElementById('canvas-frame').clientWidth;
+    height =  document.getElementById('canvas-frame').clientHeight;
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(width, height);
+    document.getElementById('canvas-frame').appendChild(renderer.domElement);
+    renderer.shadowMapEnabled = true;
+  }
+  var camera;
+  var controls;
+  function initCamera() {
+    camera = new THREE.PerspectiveCamera( 45 , width / height , 1 , 10000 );
+    camera.up.x = 0; camera.up.y = 0; camera.up.z = 1;
+    camera.position.set(1394, 1416, 854);
+
+  }
+  var scene;
+  function initScene() {
+    scene = new THREE.Scene();
+  }
+  var light, light2;
+  function initLight() {
+    light = new THREE.DirectionalLight(0xcccccc,1.6);
+    light.position = new THREE.Vector3(0.577, 0.577, 0.577);
+    light.castShadow = true;
+    scene.add(light);
+
+    light2 = new THREE.AmbientLight(0x333333);
+    scene.add(light2);
+  }
+  var sphere,plane,axis;
+  function initObject(){
+
+        sphere = new THREE.Mesh(
+                  new THREE.SphereGeometry(200),
+                  new THREE.MeshPhongMaterial({
+                       color: 0xffffff
+                       }));
+      sphere.castShadow = true;
+      sphere.receiveShadow = true;
+      scene.add(sphere);
+      sphere.position.set(0,0,500);
+
+
+     plane =  new THREE.Mesh(
+              new THREE.CircleGeometry(1000, 100),
+              new THREE.MeshLambertMaterial({
+                side: THREE.DoubleSide,
+                color: 0x000000,
+                }));
+     plane.receiveShadow = true;
+     plane.position.set(0,0,1);
+     scene.add(plane);
+
+     axis = new THREE.AxisHelper(1000);
+     scene.add(axis);
+     axis.position.set(0,0,1);
+
+  }
+
+    function loop(){
+        renderer.clear();
+        renderer.render(scene, camera);
+        window.requestAnimationFrame(loop);
+    }
+  function threeStart() {
+    initThree();
+    initCamera();
+    initScene();
+    initLight();
+    initObject();
+    loop();
+  }
+            </script>
+</head>
+<body onload="threeStart();" style="overflow: hidden;">
+<div id="canvas-frame"></div>
+</body>
+</html>
