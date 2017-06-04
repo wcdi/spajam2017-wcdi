@@ -73,7 +73,6 @@ public class ResourceDownloadingFragment extends Fragment {
 
         final File file = new File(getContext().getFilesDir(), "hip.db");
 
-
         if (file.exists());
             onSuccess.apply(file);
 
@@ -105,8 +104,5 @@ public class ResourceDownloadingFragment extends Fragment {
                 }
             });
     }
-
-    ;
-
 
 }
