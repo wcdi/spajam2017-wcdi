@@ -6,12 +6,14 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="tech.wcdi.spajam.myapplication.MainActivity">
+    tools:context="tech.wcdi.spajam.myapplication.MainActivity"
+    android:background="@color/colorPrimary">
 
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"/>
 
     <ListView
         android:id="@+id/left_drawer"
