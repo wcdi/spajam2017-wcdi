@@ -16,31 +16,31 @@ import com.firebase.ui.auth.ResultCodes;
 import java.io.Serializable;
 import java.util.Arrays;
 
-public class SetupFragment extends Fragment {
-    public static interface OnSetup extends Serializable {
+public class SignInFragment extends Fragment {
+    public static interface OnSignIn extends Serializable {
         void apply(IdpResponse response);
     }
 
-    public static interface OnSetupFailed extends Serializable {
+    public static interface OnSignInFailed extends Serializable {
         void apply();
     }
 
-    public OnSetup onSetup;
-    public OnSetupFailed onSetupFailed;
+    public OnSignIn onSignIn;
+    public OnSignInFailed onSignInFailed;
 
-    public SetupFragment() {
+    public SignInFragment() {
         // Required empty public constructor
     }
 
-    public static SetupFragment newInstance(
-        OnSetup onSetup,
-        OnSetupFailed onSetupFailed
+    public static SignInFragment newInstance(
+        OnSignIn onSetup,
+        OnSignInFailed onSetupFailed
     ) {
         Bundle arguments = new Bundle();
-        arguments.putSerializable(OnSetup.class.getName(), onSetup);
-        arguments.putSerializable(OnSetupFailed.class.getName(), onSetupFailed);
+        arguments.putSerializable(OnSignIn.class.getName(), onSetup);
+        arguments.putSerializable(OnSignInFailed.class.getName(), onSetupFailed);
 
-        SetupFragment fragment = new SetupFragment();
+        SignInFragment fragment = new SignInFragment();
         fragment.setArguments(arguments);
 
         return fragment;
@@ -50,8 +50,8 @@ public class SetupFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        onSetup = (OnSetup) getArguments().getSerializable(OnSetup.class.getName());
-        onSetupFailed = (OnSetupFailed) getArguments().getSerializable(OnSetupFailed.class.getName());
+        onSignIn = (OnSignIn) getArguments().getSerializable(OnSignIn.class.getName());
+        onSignInFailed = (OnSignInFailed) getArguments().getSerializable(OnSignInFailed.class.getName());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class SetupFragment extends Fragment {
         Bundle savedInstanceState
     ) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_setup, container, false);
+        return inflater.inflate(R.layout.fragment_sign_in, container, false);
     }
 
     @Override
@@ -91,11 +91,11 @@ public class SetupFragment extends Fragment {
 
         if (requestCode == 1000) {
             if (resultCode == ResultCodes.OK)
-                onSetup.apply(IdpResponse.fromResultIntent(data));
+                onSignIn.apply(IdpResponse.fromResultIntent(data));
             else if (resultCode == ResultCodes.CANCELED)
-                onSetupFailed.apply();
+                onSignInFailed.apply();
             else
-                onSetupFailed.apply();
+                onSignInFailed.apply();
         }
     }
 }
