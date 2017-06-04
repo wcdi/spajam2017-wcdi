@@ -11,8 +11,10 @@ camera.lookAt({x:0, y:0, z:0 });
 
 var controls = new THREE.DeviceOrientationControls( camera );
 
-var light = new THREE.PointLight(0xffffff)
+var light = new THREE.PointLight(0xffffff, 2.0)
 light.position.set(0, 0, 0)
+light.castShadow = false;
+
 
 var scene = new THREE.Scene()
 scene.add(camera)
@@ -26,11 +28,12 @@ let initialize = function () {
   var z = 0;
   for( var x=0; x<360; x+=10 ){
   for( var y =0; y<360; y+=10 ){
-      var geometry = new THREE.CubeGeometry(0.1,0.1,0.1);
+      var size = Math.random();
+      var geometry = new THREE.CubeGeometry(0.06+(size*0.1),0.06+(size*0.1),0.06+(size*0.1));
       var material = new THREE.MeshPhongMaterial( { color: 0xffffff } );
       var mesh = new THREE.Mesh( geometry, material );
       var rx = Math.floor( Math.random() * 360 ), ry = Math.floor( Math.random() * 360 )
-      mesh.position.set(30 * (( Math.sin( rx * PI/180))), 30 * ( (Math.sin(ry *  PI/180))), (30 * (Math.cos(rx * PI /180) * (Math.cos( ry * PI/180)) )))
+      mesh.position.set(30 * (( Math.sin( rx * PI/180))), 30 * ( (Math.sin(ry *  PI/180))), (30 * ((Math.cos(rx * PI /180) * (Math.cos( ry * PI/180))) )))
       scene.add(mesh);
   }
   }
