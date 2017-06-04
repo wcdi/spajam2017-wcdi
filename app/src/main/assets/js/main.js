@@ -1,7 +1,8 @@
 console.log("test")
 
-var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
-camera.position.set(0, 6, 0)
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000)
+camera.position.set(0, 0, 0)
+camera.lookAt({x:0, y:0, z:0 });
 
 var renderer = new THREE.WebGLRenderer()
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -16,7 +17,9 @@ scene.add(light)
 document.body.appendChild(renderer.domElement)
 
 var stars = [
-    [0, 0, 0]
+    [1, 0, 0],
+                 [0, 1, 0],
+                              [0, 0, 1]
 ]
 
 var render = function () {
@@ -24,5 +27,8 @@ var render = function () {
 
     renderer.render(scene, camera)
 }
+
+console.log(dataTransfer.getAccSensorData())
+console.log(dataTransfer.getMagSensorData())
 
 render()
