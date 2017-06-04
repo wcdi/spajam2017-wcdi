@@ -1,8 +1,8 @@
 package tech.wcdi.spajam.myapplication;
 
-import android.app.FragmentManager;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.bumptech.glide.load.engine.Resource;
 import com.firebase.ui.auth.IdpResponse;
 
 import java.io.File;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        final FragmentManager manager = getFragmentManager();
+        final FragmentManager manager = getSupportFragmentManager();
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         manager.beginTransaction()
             .add(
@@ -34,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void apply(IdpResponse response) {
                             manager.beginTransaction()
+                                .setCustomAnimations(
+                                    R.anim.slide_in_right,
+                                    R.anim.slide_out_left
+                                )
                                 .replace(
                                     R.id.content_frame,
                                     ResourceDownloadingFragment.newInstance(
@@ -41,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
                                             @Override
                                             public void apply(File file) {
                                                 manager.beginTransaction()
+                                                    .setCustomAnimations(
+                                                        R.anim.slide_in_right,
+                                                        R.anim.slide_out_left
+                                                    )
                                                     .replace(
                                                         R.id.content_frame,
                                                         MainFragment.newInstance()
